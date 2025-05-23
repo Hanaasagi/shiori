@@ -1,0 +1,16 @@
+[package]
+name = "application"
+version = "0.1.0"
+edition = "2024"
+default-run="main"
+
+[dependencies]
+freedesktop-desktop-entry = "0.7.13"
+freedesktop-icons = "0.4.0"
+indexmap = "2.9.0"
+serde = { version = "1.0", features = ["derive"] }
+shell-words = "1.1.0"
+
+[[bin]]
+name = "main"
+path = "src/bin/main.rs"

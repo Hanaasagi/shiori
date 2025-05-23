@@ -1,0 +1,8 @@
+[[set]]
+identifier = "clipboard-manager"
+description = """
+"""
+permissions = [
+    "clipboard-manager:allow-write-text",
+    "clipboard-manager:allow-read-text"
+]

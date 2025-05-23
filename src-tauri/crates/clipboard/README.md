@@ -1,0 +1,1 @@
+# shiori clipboard manager

@@ -1,51 +1,56 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
+import { useEffect } from "react";
+import Layout from "@/components/layout/Layout";
 import "./App.css";
+import { LogicalSize, LogicalPosition } from "@tauri-apps/api/window";
+import { BrowserRouter as Router, Routes, Route } from "react-router";
+import { currentMonitor } from "@tauri-apps/api/window";
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+import EmojiPicker from "./emoji-picker";
+import { error } from "@tauri-apps/plugin-log";
+import SearchBox from "@/pages/SearchBox";
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+async function init() {
+  try {
+    const monitor = await currentMonitor();
+    if (!monitor) {
+      return;
+    }
+
+    const appWindow = (
+      await import("@tauri-apps/api/window")
+    ).getCurrentWindow();
+
+    await appWindow.setSize(new LogicalSize(1200, 600));
+    // await appWindow.center();
+    // await appWindow.setAlwaysOnTop(true);
+    // await appWindow.setDecorations(true);
+
+    const screenWidth = monitor.size.width;
+    const windowSize = await appWindow.outerSize();
+
+    const x = screenWidth - windowSize.width;
+    const y = 0;
+
+    await appWindow.setPosition(new LogicalPosition(x, y));
+    await appWindow.show();
+  } catch (e) {
+    error(String(e));
   }
-
-  return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
-  );
 }
 
-export default App;
+export default function App() {
+  useEffect(() => {
+    init();
+  }, []);
+
+  return (
+    <Router>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<SearchBox />} />
+          <Route path="/emoji-picker" element={<EmojiPicker />} />
+        </Routes>
+      </Layout>
+    </Router>
+  );
+}

@@ -1,0 +1,9 @@
+[package]
+name = "x-window"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.98"
+once_cell = "1.21.3"
+x11rb = "0.13.1"

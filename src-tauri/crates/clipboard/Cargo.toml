@@ -1,0 +1,9 @@
+[package]
+name = "clipboard"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+arboard = "3.5.0"
+fuzzy-matcher = "0.3.7"
+walkdir = "2.5.0"
