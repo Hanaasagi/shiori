@@ -8,28 +8,26 @@ use tauri::State;
 use tracing::{info, instrument, warn};
 
 use base64::{engine::general_purpose, Engine as _};
-use std::fs;
 use std::path::Path;
+use tokio::fs;
 
 #[tauri::command]
 #[instrument]
-pub(crate) fn read_icon_as_base64(path: String) -> Option<String> {
+pub async fn read_icon_as_base64(path: String) -> Option<String> {
     let start = Instant::now();
 
-    let mime = if path.ends_with(".png") {
-        "image/png"
-    } else if path.ends_with(".svg") {
-        "image/svg+xml"
-    } else {
-        "application/octet-stream"
+    let mime = match path {
+        _ if path.ends_with(".png") => "image/png",
+        _ if path.ends_with(".svg") => "image/svg+xml",
+        _ => "application/octet-stream",
     };
 
-    let data = fs::read(Path::new(&path)).ok().map(|bytes| {
+    let data = fs::read(Path::new(&path)).await.ok().map(|bytes| {
         let encoded = general_purpose::STANDARD.encode(&bytes);
         format!("data:{};base64,{}", mime, encoded)
     });
-    info!("took {:?}", start.elapsed());
 
+    info!("took {:?}", start.elapsed());
     data
 }
 
