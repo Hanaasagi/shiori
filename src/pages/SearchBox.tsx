@@ -2,12 +2,12 @@ import type React from "react";
 import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { Input } from "@/components/ui/input";
-import { info } from "@tauri-apps/plugin-log";
+import { info, error } from "@tauri-apps/plugin-log";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search } from "lucide-react";
 import { LazyIcon } from "@/components/ui/icon";
-import { listApplications } from "@/lib/api/searchApp";
+import { listApplications, lanuchApplication } from "@/lib/api/searchApp";
 
 interface Command {
   id: string;
@@ -108,9 +108,16 @@ function SearchBox() {
         case "Enter":
           e.preventDefault();
           if (commands[selectedIndex]) {
-            info(
-              `Executing: ${commands[selectedIndex].title} EXEC ${commands[selectedIndex].exec}`,
-            );
+            const command = commands[selectedIndex];
+            lanuchApplication(command.id)
+              .then((res) => {
+                info(`launched application ${command.id} result: ${res}`);
+              })
+              .catch((err) => {
+                error(
+                  `failed to launch application ${command.id} error: ${err}`,
+                );
+              });
           }
           break;
         case "Escape":
@@ -196,11 +203,17 @@ function SearchBox() {
                       ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700"
                       : "hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
-                  onClick={() => {
+                  onClick={async () => {
                     setSelectedIndex(index);
-                    console.log(
-                      `Executing: ${command.title} EXEC: ${command.exec}`,
-                    );
+                    const command = commands[index];
+                    try {
+                      let res = await lanuchApplication(command.id);
+                      info(`launched application ${command.id} result: ${res}`);
+                    } catch (err) {
+                      error(
+                        `failed to launch application ${command.id} error: ${err}`,
+                      );
+                    }
                   }}
                 >
                   <div className="flex-shrink-0 w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">

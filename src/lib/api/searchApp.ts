@@ -24,3 +24,7 @@ export async function listApplications(
     limit: limit,
   });
 }
+
+export async function lanuchApplication(appId: string): Promise<boolean> {
+  return await invoke("launch_application", { appId });
+}

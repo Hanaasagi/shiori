@@ -21,7 +21,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::greet,
             commands::list_applications,
-            commands::read_icon_as_base64
+            commands::read_icon_as_base64,
+            commands::launch_application,
         ])
         .manage(commands::AppState {
             service: Mutex::new(ApplicationService::default()),

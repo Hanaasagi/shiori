@@ -5,7 +5,7 @@ use fuzzy_matcher::FuzzyMatcher;
 use std::sync::Mutex;
 use std::time::Instant;
 use tauri::State;
-use tracing::{info, instrument};
+use tracing::{info, instrument, warn};
 
 use base64::{engine::general_purpose, Engine as _};
 use std::fs;
@@ -39,7 +39,7 @@ pub(crate) struct AppState {
 
 fn list_applications_impl(
     state: State<AppState>,
-    query: Option<String>,
+    query: Option<&str>,
     offset: usize,
     limit: usize,
 ) -> Vec<DesktopEntry> {
@@ -81,16 +81,34 @@ fn list_applications_impl(
 #[instrument(skip(state))]
 pub(crate) fn list_applications(
     state: State<AppState>,
-    query: Option<String>,
+    query: Option<&str>,
     offset: usize,
     limit: usize,
 ) -> Vec<DesktopEntry> {
     let start = Instant::now();
-    let res = list_applications_impl(state, query.clone(), offset, limit);
+    let res = list_applications_impl(state, query, offset, limit);
 
     info!("took {:?}", start.elapsed());
 
     res
+}
+
+#[tauri::command]
+#[instrument(skip(state))]
+pub(crate) fn launch_application(state: State<AppState>, app_id: &str) -> bool {
+    let start = Instant::now();
+    let service = state.service.lock().unwrap();
+
+    match service.launch(app_id, None) {
+        Ok(_) => {
+            info!("took {:?}", start.elapsed());
+            true
+        }
+        Err(e) => {
+            warn!("error: {}, took {:?}", e, start.elapsed());
+            false
+        }
+    }
 }
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
