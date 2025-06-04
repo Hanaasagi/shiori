@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search } from "lucide-react";
 import { LazyIcon } from "@/components/ui/icon";
+import { listApplications } from "@/lib/api/searchApp";
 
 interface Command {
   id: string;
@@ -17,19 +18,6 @@ interface Command {
   categories: string[];
   keywords?: string[];
   exec: string | null;
-}
-
-export interface DesktopEntry {
-  id: string;
-  name: string;
-  lower_name: string;
-  type: string | null;
-  categories: string[];
-  keywords: string[];
-  comment: string | null;
-  exec: string | null;
-  path: string | null;
-  iconPath: string | null;
 }
 
 async function loadIcon(path: string) {
@@ -59,11 +47,11 @@ function SearchBox() {
     if (page !== 0 && !hasMore) return;
     loadingRef.current = true;
 
-    const items = await invoke<DesktopEntry[]>("list_applications", {
+    const items = await listApplications(
       query,
-      offset: pageNumber * PAGE_SIZE,
-      limit: PAGE_SIZE,
-    });
+      pageNumber * PAGE_SIZE,
+      PAGE_SIZE,
+    );
 
     const newCommands = items.map((item) => ({
       id: item.id,

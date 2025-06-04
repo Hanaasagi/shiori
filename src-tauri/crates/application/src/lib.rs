@@ -18,7 +18,7 @@ pub struct DesktopEntry {
     pub categories: Vec<String>,
     pub comment: Option<String>,
     pub exec: Option<String>,
-    pub path: Option<PathBuf>,
+    pub path: PathBuf,
 }
 
 impl DesktopEntry {
@@ -71,7 +71,7 @@ impl ApplicationService {
         s
     }
 
-    pub fn launch_from_exec(&self, id: &str, file_url: Option<&str>) -> std::io::Result<()> {
+    pub fn launch(&self, id: &str, file_url: Option<&str>) -> std::io::Result<()> {
         let exec = self.get(id);
         if exec.is_none() {
             panic!("no exec");
@@ -124,7 +124,8 @@ impl ApplicationService {
                 .collect(),
             comment: entry.comment(locales).map(String::from),
             exec: entry.exec().map(String::from),
-            path: entry.path().map(PathBuf::from),
+            // path: entry.path().map(PathBuf::from),
+            path: entry.path,
         }
     }
 
