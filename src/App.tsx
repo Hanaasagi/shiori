@@ -3,13 +3,14 @@ import Layout from "@/components/layout/Layout";
 import "./App.css";
 import { LogicalSize, LogicalPosition } from "@tauri-apps/api/window";
 import { BrowserRouter as Router, Routes, Route } from "react-router";
+import { isTauri } from "@/lib/utils";
 import { currentMonitor } from "@tauri-apps/api/window";
 
 import EmojiPicker from "@/pages/EmojiPicker";
-import { error } from "@tauri-apps/plugin-log";
+import { info, error } from "@tauri-apps/plugin-log";
 import SearchBox from "@/pages/SearchBox";
 
-async function init() {
+async function initTauri() {
   try {
     const monitor = await currentMonitor();
     if (!monitor) {
@@ -33,15 +34,18 @@ async function init() {
 
     await appWindow.setPosition(new LogicalPosition(x, y));
     await appWindow.show();
+    info("initialized Tauri");
   } catch (e) {
     error(String(e));
   }
 }
 
 export default function App() {
-  useEffect(() => {
-    init();
-  }, []);
+  if (isTauri) {
+    useEffect(() => {
+      initTauri();
+    }, []);
+  }
 
   return (
     <Router>
