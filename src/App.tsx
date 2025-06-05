@@ -5,7 +5,7 @@ import { LogicalSize, LogicalPosition } from "@tauri-apps/api/window";
 import { BrowserRouter as Router, Routes, Route } from "react-router";
 import { currentMonitor } from "@tauri-apps/api/window";
 
-import EmojiPicker from "./emoji-picker";
+import EmojiPicker from "@/pages/EmojiPicker";
 import { error } from "@tauri-apps/plugin-log";
 import SearchBox from "@/pages/SearchBox";
 
@@ -47,8 +47,9 @@ export default function App() {
     <Router>
       <Layout>
         <Routes>
-          <Route path="/" element={<SearchBox />} />
-          <Route path="/emoji-picker" element={<EmojiPicker />} />
+          {/* <Route path="/" element={<SearchBox />} /> */}
+          {/* <Route path="/emoji-picker" element={<EmojiPicker />} /> */}
+          <Route path="/" element={<EmojiPicker />} />
         </Routes>
       </Layout>
     </Router>
